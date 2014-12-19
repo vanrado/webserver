@@ -1,0 +1,22 @@
+1 Jednoduchý web server, podporujúci podmnožinu  protokolu HTTP/1.0.
+Server musí implementovať minimálne metódu GET. Požiadavky môžu prichádzať z rôznych WEB klientov, server preto musí podporovať obsluhu viacerých klientov súčasne.
+
+GET <specifikacia_suboru> HTTP/1.0\n\n
+
+Ak je špecifikácia súboru zadaný iba znak lomky, potom server odošle súbor index.html, ak taký
+ existuje v koreňovom adresári servera.
+ 
+Špecifikácia súboru má tvar:
+
+/<adresar>/<adresar>/…/<subor>
+
+Pri spustení servera sa na príkazovom riadku špecifikuje port, na ktorom bude server prijímať požiadavky, ako aj adresár slúžiaci ako koreňový adresár serveru. Server nesmie umožniť prístup mimo podstromu, koreňového adresára (napr. Pomocou cesty obsahujúcej /../).
+
+Funkčnosť servera bude overená pomocou webového prehliadača.
+
+Implementácia servera bude pozostávať z dvoch častí:
+
+1) Implementácia programu, ktorý bude funkčnosťou ekvivalentnýprogramu netcat  (do miery vyžadovanej pre implementáciu servera) v jazyku C s použitím socketov
+
+2) Implementácia samotného servera s využitím programu z bodu 1)  Táto časť bude implementovaná v Bash-i a bude zabezpečovať  spustenie servera, cyklickú obsluhu prichádzajúcich požiadaviek (parsovanie, ošetrenie prípadných chýb, nájdenie požadovaného,
+ dokumentu a jeho odoslanie klientov) a korektné ukončenie servera.

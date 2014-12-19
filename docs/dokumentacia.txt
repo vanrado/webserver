@@ -1,0 +1,159 @@
+Jednoduchý web server, podporujúci podmnožinu protokolu HTTP/1.0
+Semestrána práca
+
+Radovan Račák
+Fakulta riadenia a informatiky
+Žilinská univerzita v Žiline
+
+Ako funguje Java Web Server
+
+Úvod
+Web server je tiež často nazývaný Hypertext Transfer Protocol (HTTP) server pretože používa http ku komunikácii s jeho klientmi, ktorí sú zvyčajne webové prehliadače. Java webový server používa dve dôležité triedy java.net.Socket a java.net.ServerSocket, a komunikuje cez http správy. 
+
+Hypertext Transfer Protocol (HTTP)
+HTTP je protokol, ktorý poskytuje webovým serverom a browserom posielať a prijímať dáta cez Internet. Je to server typu požiadavka-odpoveď, to znamená, že klient vytvorí požiadavku a server tejto požiadavke odpovedá. 
+HTTP používa spoľahlivé TCP spojenia, štandardne na porte 80. Prvá verzia http protokolu bola HTTP/0.9, ktorú nahradila verzia HTTP/1.0. Aktuálna verzia je HTTP/1.1.  
+V HTTP, klient vždy iniciuje transakciu založením spojenia a poslaním HTTP požiadavky. Server nemôže sám od seba kontaktovať klienta alebo vytvoriť spätné spojenie s klientom. 
+Klient alebo server môžu predčasne spojenie ukončiť. Napríklad týmto spôsobom, keď používame webový prehliadač, môžeme kliknúť tlačítko STOP v našom webovom prehliadači k zastaveniu procesu sťahovania súboru a efektívne to ukončí http spojenie s webovým serverom.
+HTTP Požiadavky
+HTTP požiadavka pozostáva z troch komponentov:
+1 Typ metódy(zvyčajne GET alebo POST) – URI(jednotný identifikátor zdroja – webová/internetová adresa) – Verzia protokolu (HTTP/1.1) (1)
+2 Hlavička požiadavky (2)
+3 Telo entity (4)
+
+Príklad požiadavky HTTP: 
+POST /servlet/default.jsp HTTP/1.1 (1)
+Accept: text/plain; text/html (2)
+Accept-Language: en-gb 
+Connection: Keep-Alive 
+Host: localhost 
+Referer: http://localhost/ch8/SendDetails.htm 
+User-Agent: Mozilla/4.0 (compatible; MSIE 4.01; Windows 98) 
+Content-Length: 33 
+Content-Type: application/x-www-form-urlencoded 
+Accept-Encoding: gzip, deflate 
+(3)
+LastName=Franks&FirstName=Michael (4)
+
+URI zvyčajne interpretuje relatívny serverový koreňový adresár. V takejto forme, vždy by mala táto adresa začínať lomítkom /
+
+Webová hlavička obsahuje dôležité informácie o klientskom prostredí a telu entity. 
+
+Veľmi dôležitý je prázdny riadok (3) (CRLF) ktorý sa nachádza medzi hlavičkou HTTP a telom entity. Tento riadok označuje začiatok tela entity, niektoré zdroje uvádzajú, že CRLF je štvrtým komponentom HTTP požiadavky.
+
+HTTP odpoveď
+Podobne ako požiadavka, HTTP odpoveď tiež pozostáva z troch komponentov:
+Verzia protokolu – Status kód – Popis (1)
+Hlavička odpovede (2)
+Telo entity (HTML kód) (3)
+
+Príklad HTTP odpovede
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/4.0
+Date: Mon, 3 Jan 1998 13:13:33 GMT
+Content-Type: text/html
+Last-Modified: Mon, 11 Jan 1998 13:23:42 GMT
+Content-Length: 112
+
+<html>
+<head>
+<title>HTTP Response Example</title></head><body>
+Welcome to Brainy Software
+</body>
+</html>
+
+
+Trieda java.net.Socket
+Trieda Socket reprezentuje klientsky socket, socket ktorý vytvárame kedykoľvek keď chceme pripojiť ku vzdialenej aplikácii. 
+Socket je koncový bod sieťového pripojenia. Socket umožňuje aplikácii čítať a zapisovať do siete. Dve aplikácie ktoré sa nachádzajú na dvoch rôznych počítačoch môžu medzi sebou komunikovať pomocou posielania a prijímania dátových/bajtových prúdov cez pripojenie. Aby bolo možné poslať správu inej aplikácii je nutné vedieť jej IP adresu a číslo portu jej socketu. 
+K vytvoreniu socketu, môžeme použiť rôzne konštruktory triedy Socket. Jeden z nich príjma meno a číslo portu ako parameter.
+public Socket(String host, int port)
+kde host je názov vzdialeného počítača alebo IP adresa a port je číslo portu vzdialenej aplikácie.
+Napríklad k pripojeniu do webovej aplikácie yahoo.com na porte 80, by sme vytvorili takýto socket:
+new Socket("yahoo.com", 80);
+
+Trieda java.net.ServerSocket
+Ak chceme implementovať serverovú aplikáciu, napríklad HTTP server alebo FTP server, potrebujeme iný prístup nie len triedu java.net.Socket, pretože náš server musí bežať po celú dobu, pretože sa nevie kedy sa klientska aplikácia pokúsi naň pripojiť.
+
+Pre tento účel potrebujeme použiť triedu java.net.ServerSocket. Táto trieda predstavuje implementáciu server socket-u. Server socket čaká na požiadavku na pripojenie zo strany klienta. Akonáhle dostane požiadavku na spojenie, vytvorí inštanciu triedy Socket ktorá ma na starosti komunikáciu s klientom.
+Trieda ponúka 4 typy konštruktorov. Potrebujeme hlavne špecifikovať IP adresu a číslo portu, na ktorom bude server socket počúvať. Zvyčajne IP adresa je 127.0.0.1, to znamena že server socket bude počúvať na lokálnom počítači. 
+
+Akonáhle dostaneme inštanciu ServerSocket-u, môžeme tejto inštancii nadeliť čakanie na požiadavku o spojenie, zavolaním metódy accept(). Tato metóda sa vráti len v tom prípade ak sa uskutoční požiadavka na pripojenie z klientskej strany. Vratia inštanciu triedy Socket. Tento objekt Socket môže byť použitý k poslaniu a prijímaniu bajtových/dátových prúdov z klientskej aplikácie 
+
+
+Zadanie
+Jednoduchý web server, podporujúci podmnožinu  protokolu HTTP/1.0.
+Server musí implementovať minimálne metódu GET. Požiadavky môžu prichádzať z rôznych WEB klientov, server preto musí podporovať obsluhu viacerých klientov súčasne.
+
+GET <specifikacia_suboru> HTTP/1.0\n\n
+
+Ak je špecifikácia súboru zadaný iba znak lomky, potom server odošle súbor index.html, ak taký
+ existuje v koreňovom adresári servera.
+ 
+Špecifikácia súboru má tvar:
+
+/<adresar>/<adresar>/…/<subor>
+
+Pri spustení servera sa na príkazovom riadku špecifikuje port, na ktorom bude server prijímať požiadavky, ako aj adresár slúžiaci ako koreňový adresár serveru. Server nesmie umožniť prístup mimo podstromu, koreňového adresára (napr. Pomocou cesty obsahujúcej /../).
+
+Funkčnosť servera bude overená pomocou webového prehliadača.
+
+Implementácia
+
+Zadanie som sa rozhodol naprogramovať v Jave, nakoľko ma táto technológia zaujíma a chcel som si prehĺbiť vedomosti ohľadom Socketov a vlákien.
+Aplikácia predstavuje jednoduchý HTTP webový server, implementovaný v Jave pomocou Socketov a vlákien.
+
+Špecifikácia tried
+Zoznam balíčkov
+webserver
+webserver.core
+shutdown
+Zoznam tried
+webserver
+	ServerApplication.java
+webserver.core
+	MultiThreadedWorker.java
+	Request.java
+	Response.java
+	WebServer.java
+shutdown
+	Shutdown.java
+Hlavná trieda
+Hlavná trieda aplikácie je ServerApplication.java kde sa nachádza hlavná metóda Main
+Spustenie aplikácie
+Aplikácia sa spúšťa príkazom
+java src.ServerApplication $PORT $WEBROOT
+
+kde  parameter $PORT predstavuje číslo portu na ktorom bude server spustený a parameter $WEBROOT predstavuje názov koreňového adresára, ktorý sa nachádza v koreňovom adresári aplikácie
+Pokiaľ sa port alebo názov koreňového adresára nešpecifikuje, použijú sa štandardné hodnoty
+port = 15000
+webroot = webroot
+
+
+
+Spustenie aplikácie cez shell
+V koreňovom adresári aplikácie sa nachádza shell súbor
+startup.sh
+
+Po spustení, program ponúka ponuku cez ktorú môžeme server spustiť zadaním čísla ponuky 3 a potvrdením(Enter)
+3 – Spusť server
+
+Beh aplikácie
+Po úspešnom spustení servera sa vypíše na konzolu výstup 
+Server spusteny na adrese localhost:15000
+Korenovy adresar: /home/rado/Projekty/server/webroot
+Funkčnosť
+Po vytvorení požiadavky GET na spustený server – t.j. GET na adresu lokalhost port 15000 (podľa špecifikácie portu), s každou prijatou požiadavkou server informuje cez konzolu špecifikáciu požiadavky v tvare
+GET / HTTP/1.1
+Takže v konečnom dôsledku by výstup na konzole pri vytvorení jednej požiadavky cez browser mohol vyzerať nesledovne
+Server spusteny na adrese localhost:15000
+Korenovy adresar: /home/rado/Projekty/server/webroot
+GET / HTTP/1.1
+GET /favicon.ico HTTP/1.1
+GET /favicon.ico HTTP/1.1
+Vypnutie servera
+Ak chceme bezpečne náš server vypnúť tak postupujeme nasledovne.
+Apikácia štandardne používa port 14999 na príjem správcovských príkazov. Zatiaľ je implementovaný len jeden príkaz správcu a to príkaz shutdown.
+Vytvorením požiadavky GET na server localhost s URI shutdown server bezpečne vypneme
+GET /shutdown HTTP/1.1
+Môžeme tiež použiť triedu Shutdown, ktorá vytvorí Socket ktorý sa pripojí na lokálny port 14999 a odošle hore uvedenú požiadavku.
